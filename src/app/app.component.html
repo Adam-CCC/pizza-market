@@ -1,0 +1,167 @@
+<div class="page">
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="#top" aria-label="Pizza Cheff">
+        <span class="logo__badge"></span>
+        <span class="logo__text">
+          <span class="logo__title">PIZZA</span>
+          <span class="logo__title">CHEFF</span>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="Главная навигация">
+        <a href="#products">Пиццы</a>
+        <a href="#products">Меню</a>
+        <a href="#order">Доставка и оплата</a>
+        <a href="#order">Контакты</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__content">
+          <h1>Самая вкусная пицца в мире только в Pizza Cheff</h1>
+
+          <div class="hero__features">
+            <article class="feature">
+              <span class="feature__icon feature__icon--speed"></span>
+              <div>
+                <h2>Лучшее тесто</h2>
+                <p>Мы создаем тесто только из отборной итальянской муки на основе натуральных ингредиентов.</p>
+              </div>
+            </article>
+
+            <article class="feature">
+              <span class="feature__icon feature__icon--chef"></span>
+              <div>
+                <h2>Лучшие повара</h2>
+                <p>Пиццы готовят профессиональные итальянские повара с многолетним опытом.</p>
+              </div>
+            </article>
+
+            <article class="feature">
+              <span class="feature__icon feature__icon--quality"></span>
+              <div>
+                <h2>Гарантия качества</h2>
+                <p>Мы гарантируем идеальное качество приготовления по фирменным стандартам Pizza Cheff.</p>
+              </div>
+            </article>
+
+            <article class="feature">
+              <span class="feature__icon feature__icon--delivery"></span>
+              <div>
+                <h2>Быстрая доставка</h2>
+                <p>Доставим ваш заказ максимально быстро, пока пицца остается горячей и ароматной.</p>
+              </div>
+            </article>
+          </div>
+
+          <a class="button" href="#products">Выбрать пиццу</a>
+        </div>
+
+        <div class="hero__media">
+          <img [src]="heroImage" alt="Большая пицца Pizza Cheff">
+        </div>
+      </div>
+    </section>
+
+    <section id="products" class="products">
+      <div class="container">
+        <h2 class="section-title">Выберите свою любимую пиццу</h2>
+
+        <div class="products__grid">
+          <article class="product-card" *ngFor="let product of products">
+            <button
+              class="product-card__image"
+              type="button"
+              (click)="openImage(product)"
+              [attr.aria-label]="'Открыть изображение ' + product.name"
+            >
+              <img [src]="product.image" [alt]="product.name">
+            </button>
+
+            <div class="product-card__body">
+              <h3>{{ product.name }}</h3>
+              <p>{{ product.description }}</p>
+              <button class="button button--small" type="button" (click)="chooseProduct(product)">В корзину</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="order" class="order">
+      <div class="container order__inner">
+        <div class="order__content">
+          <h2>Хватит думать!<br>Доставим заказ за 30 минут!</h2>
+          <p>
+            Мы гарантированно доставим вашу пиццу за 30 минут с момента оформления заказа.
+            Если мы опоздаем, вы получите скидку на следующий заказ.
+          </p>
+          <p>
+            Просто заполните форму справа. Если есть выбранная пицца, мы автоматически добавим её в заказ.
+          </p>
+        </div>
+
+        <form class="order-form" #orderForm="ngForm" ngNativeValidate (ngSubmit)="submitOrder(orderForm)">
+          <input
+            type="text"
+            name="name"
+            placeholder="Ваше имя"
+            required
+            minlength="2"
+            maxlength="40"
+            [(ngModel)]="formData.name"
+            (keydown)="preventDotInput($event)"
+            (input)="sanitizeName()"
+          >
+
+          <input
+            type="text"
+            name="address"
+            placeholder="Адрес доставки"
+            required
+            minlength="8"
+            maxlength="120"
+            [(ngModel)]="formData.address"
+          >
+
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Телефон"
+            required
+            pattern="^\\+?[0-9\\s\\-()]{10,18}$"
+            [(ngModel)]="formData.phone"
+          >
+
+          <button class="button button--submit" type="submit" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Отправляем...' : 'Оформить заказ' }}
+          </button>
+        </form>
+
+        <div class="order__image">
+          <img [src]="orderImage" alt="Кусочек пиццы">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="overlay" *ngIf="fullscreenImage" (click)="closeImage()">
+    <div class="overlay__dialog overlay__dialog--image" (click)="$event.stopPropagation()">
+      <button class="overlay__close" type="button" aria-label="Закрыть" (click)="closeImage()">×</button>
+      <img [src]="fullscreenImage.image" [alt]="fullscreenImage.name">
+      <p>{{ fullscreenImage.name }}</p>
+    </div>
+  </div>
+
+  <div class="overlay" *ngIf="isSuccessPopupOpen" (click)="closeSuccessPopup()">
+    <div class="overlay__dialog overlay__dialog--success" (click)="$event.stopPropagation()">
+      <button class="overlay__close" type="button" aria-label="Закрыть" (click)="closeSuccessPopup()">×</button>
+      <h2>Спасибо за заказ</h2>
+      <p>Мы уже приняли заявку и скоро свяжемся с вами для подтверждения.</p>
+    </div>
+  </div>
+</div>
